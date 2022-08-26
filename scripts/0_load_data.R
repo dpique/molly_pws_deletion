@@ -8,15 +8,14 @@ library(patchwork)
 
 #data(geneModels)
 
+primers <- read_csv(here::here("data/primers.csv"))
+primers2 <- primers %>% separate_rows(coord_hg38, product_length,sep = ";")
 
-
-
-
-listMarts()
+#listMarts()
 r=useMart(biomart = "ENSEMBL_MART_ENSEMBL", host = "grch37.ensembl.org")#host="grch37.ensembl.org")
 #r=useMart("ENSEMBL_MART_FUNCGEN")
 
-listDatasets(r)
+#listDatasets(r)
 d=useDataset(dataset = "hsapiens_gene_ensembl", mart=r)
 
 listFilters(d) #d@filters with_refseq_mrna
@@ -81,7 +80,7 @@ d_lit <- read_excel(file_path_to_data, sheet = "Sheet2", range = "C23:L32") %>% 
 min_coord0 <- min(d_lit$liftover_hg19_start) #- round(min(d_lit$liftover_hg19_start) * percent_expansion, 0)  #- 1000 #+100000#
 max_coord0 <- max(d_lit$liftover_hg19_end) #+ round(max(d_lit$liftover_hg19_end) * percent_expansion, 0)#+ 1000
 range_coords <- max_coord0 - min_coord0
-percent_expansion <- 1#0.30
+percent_expansion <- 0#0.30
 min_coord <- min(d_lit$liftover_hg19_start) - round(range_coords * percent_expansion, 0)  #- 1000 #+100000#
 max_coord <- max(d_lit$liftover_hg19_end) + round(range_coords * percent_expansion, 0)#+ 1000
 
@@ -159,6 +158,8 @@ tbl_gene.track3 <- tbl_gene.track2 %>% filter(!feature %in% feat_to_remove) %>%
 avg_start_snhg14 <- tbl_gene.track3 %>% filter(symbol == "SNHG14") %>% pull(start) %>% mean()
 height_snhg14 <- tbl_gene.track3 %>% filter(symbol == "SNHG14") %>% head(1) %>% pull(ylab_dat) #%>% mean()
 
+# transcripts
+# IC1
 
 p3 <- ggplot(tbl_gene.track3, aes(xmin=start, xmax=end,ymin=ylab_dat-0.5, ymax=ylab_dat, color=feature, fill=feature)) + 
   geom_line(aes(x = start, y = ylab_dat-0.25, group=paste0(tbl_gene.track3$feature, tbl_gene.track3$symbol)), color="black", size=0.25) +
